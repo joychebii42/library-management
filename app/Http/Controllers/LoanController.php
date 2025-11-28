@@ -25,10 +25,20 @@ class LoanController extends Controller
             return back()->with('error', 'No available copies of this book to borrow.');
         }
 
+        // Check if the user has any unpaid penalties
+        $unpaidPenalties = Loan::where('user_id', Auth::id())
+            ->where('penalty_status', 'unpaid')
+            ->where('penalty_amount', '>', 0)
+            ->exists();
+
+        if ($unpaidPenalties) {
+            return back()->with('error', 'You cannot borrow new books until you have paid all outstanding penalties.');
+        }
+
         // Check if the user already has an active loan for this book
         $activeLoan = Loan::where('user_id', Auth::id())
             ->where('book_id', $book->id)
-            ->whereNull('returned_date')
+            ->whereNull('returned_at')
             ->exists();
 
         if ($activeLoan) {
@@ -41,8 +51,8 @@ class LoanController extends Controller
                 Loan::create([
                     'user_id' => Auth::id(),
                     'book_id' => $book->id,
-                    'borrowed_date' => Carbon::now(),
-                    'due_date' => Carbon::now()->addWeeks(2), // e.g., 2-week loan period
+                    'loaned_at' => Carbon::now(),
+                    'due_date' => Carbon::now()->addDays(14), // 14-day loan period
                 ]);
             });
         } catch (\Exception $e) {
@@ -56,7 +66,7 @@ class LoanController extends Controller
     /**
      * Mark a loan as returned.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Request  $request 
      * @param  \App\Models\Loan  $loan
      * @return \Illuminate\Http\RedirectResponse
      */
@@ -68,9 +78,20 @@ class LoanController extends Controller
         }
 
         try {
-            DB::transaction(function () use ($loan) {
-                // Mark the book as returned
-                $loan->update(['returned_date' => Carbon::now()]);
+            DB::transaction(function () use ($loan, $request) {
+                $returnTimestamp = Carbon::now();
+                $loan->returned_at = $returnTimestamp;
+
+                // Finalize penalty if the book is returned late and the penalty isn't already paid
+                if ($returnTimestamp->isAfter($loan->due_date) && $loan->penalty_status !== 'paid') {
+                    // Use startOfDay() to count full days overdue
+                    // Note: diffInDays calculates the difference, so we use abs() and ensure positive value
+                    $overdueDays = abs($loan->due_date->startOfDay()->diffInDays($returnTimestamp->startOfDay()));
+                    $loan->penalty_amount = $overdueDays * \App\Console\Commands\CalculatePenalties::PENALTY_RATE_PER_DAY;
+                    $loan->penalty_status = 'unpaid';
+                }
+
+                $loan->save();
             });
         } catch (\Exception $e) {
             return back()->with('error', 'An error occurred while returning the book. Please try again.');

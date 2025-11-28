@@ -12,15 +12,17 @@ class Loan extends Model
     protected $fillable = [
         'user_id',
         'book_id',
-        'borrowed_date',
+        'loaned_at',
         'due_date',
-        'returned_date',
+        'returned_at',
+        'penalty_amount',
+        'penalty_status',
     ];
 
 protected $casts = [
-    'borrowed_date' => 'date',
+    'loaned_at' => 'datetime',
     'due_date' => 'date',
-    'returned_date' => 'date',
+    'returned_at' => 'datetime',
 ];
 
     public function user()

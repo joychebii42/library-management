@@ -17,7 +17,7 @@ class BookController extends Controller
         $query = Book::query();
 
        
-        $query->whereRaw('quantity > (SELECT COUNT(*) FROM loans WHERE loans.book_id = books.id AND loans.returned_date IS NULL)');
+        $query->whereRaw('quantity > (SELECT COUNT(*) FROM loans WHERE loans.book_id = books.id AND loans.returned_at IS NULL)');
 
         // General search
         if ($request->filled('search')) {

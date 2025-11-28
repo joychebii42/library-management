@@ -33,7 +33,7 @@ class Book extends Model
         if (array_key_exists('loans_count', $this->attributes)) {
             return $this->quantity - $this->loans_count;
         }
-        return $this->quantity - $this->loans()->whereNull('returned_date')->count();
+        return $this->quantity - $this->loans()->whereNull('returned_at')->count();
     }
 
     /**

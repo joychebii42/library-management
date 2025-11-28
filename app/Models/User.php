@@ -48,7 +48,21 @@ class User extends Authenticatable
     public function books()
     {
         return $this->belongsToMany(Book::class, 'loans')
-            ->withPivot('borrowed_date', 'due_date', 'returned_date')
+            ->withPivot('borrowed_at', 'due_date', 'returned_at')
+            ->withpivot('loaned_at', 'due_date', 'returned_at')
             ->withTimestamps();
+    }
+
+    /**
+     * Calculate the total penalty for the user.
+     *
+     * @return float
+     */
+    public function getTotalPenaltyAttribute(): float
+    {
+        return $this->loans()
+            ->whereNull('returned_at')
+            ->get()
+            ->sum('penalty');
     }
 }

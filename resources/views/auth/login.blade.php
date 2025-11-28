@@ -24,7 +24,8 @@
             @endif
 
             @if ($errors->any())
-                <div class="mt-2 text-sm text-red-600">
+                 <div class="mt-2 text-sm text-red-600">
+                <div class="mt-2 text-sm text-red-600 space-y-1">
                     @foreach ($errors->all() as $error)
                         <p>{{ $error }}</p>
                     @endforeach

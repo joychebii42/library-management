@@ -46,6 +46,7 @@
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Book Title</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Author</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Due Date</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Penalty</th>
                                     <th scope="col" class="relative px-6 py-3">
                                         <span class="sr-only">Return</span>
                                     </th>
@@ -67,6 +68,11 @@
                                                 <span class="block text-xs">(Overdue)</span>
                                             @endif
                                         </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            @if($loan->penalty_amount > 0)
+                                                <span class="font-bold text-red-600">${{ number_format($loan->penalty_amount, 2) }} ({{ ucfirst($loan->penalty_status) }})</span>
+                                            @endif
+                                        </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                             {{-- Return Button Form --}}
                                             <form action="{{ route('loans.return', $loan->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to return this book?');">
@@ -78,7 +84,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="4" class="px-6 py-4 text-center text-gray-500">
+                                        <td colspan="5" class="px-6 py-4 text-center text-gray-500">
                                             You have not borrowed any books yet.
                                         </td>
                                     </tr>

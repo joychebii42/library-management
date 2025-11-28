@@ -13,9 +13,11 @@ class CreateLoansTable extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('book_id')->constrained()->onDelete('cascade');
-            $table->date('borrowed_date');
+            $table->timestamp('loaned_at');
             $table->date('due_date');
-            $table->date('returned_date')->nullable();
+            $table->timestamp('returned_at')->nullable();
+            $table->decimal('penalty_amount', 8, 2)->default(0.00);
+            $table->string('penalty_status')->default('unpaid');
             $table->timestamps();
         });
     }
