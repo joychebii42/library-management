@@ -30,21 +30,29 @@ class BookController extends Controller
         }
 
         // Specific field searches
-        if ($request->filled('author')) {
-            $query->where('author', 'like', '%' . $request->input('author') . '%');
-        }
-        if ($request->filled('isbn')) {
-            $query->where('isbn', 'like', '%' . $request->input('isbn') . '%');
-        }
-        if ($request->filled('publisher')) {
-            $query->where('publisher', 'like', '%' . $request->input('publisher') . '%');
-        }
+        if ($author = $request->get('author')) {
+        $query->where('author', $author);
+    }
+    if ($isbn = $request->get('isbn')) {
+        $query->where('isbn', $isbn);
+    }
+    if ($publisher = $request->get('publisher')) {
+        $query->where('publisher', $publisher);
+    }
 
-        $books = $query->latest()->paginate(10)->withQueryString();
+    $books = $query->paginate(10); // Adjust pagination as needed
+    
+    // --- NEW: Fetch unique values for dropdowns ---
+    $authors = Book::select('author')->distinct()->pluck('author');
+    $isbns = Book::select('isbn')->distinct()->pluck('isbn');
+    $publishers = Book::select('publisher')->distinct()->pluck('publisher');
 
-
-        return view('books.index', compact('books'));
-
+    return view('books.index', [
+        'books' => $books,
+        'authors' => $authors, // Pass the new data to the view
+        'isbns' => $isbns,
+        'publishers' => $publishers,
+    ]);
     }
 
     public function show($id)

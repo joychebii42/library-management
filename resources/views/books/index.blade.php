@@ -27,39 +27,72 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
             {{-- Sidebar for Search and Filters --}}
-            <aside class="lg:col-span-1">
-                <div class="p-6 bg-gray-50 rounded-lg shadow">
-                    <h3 class="text-xl font-semibold text-gray-800 mb-4">Filter & Search</h3>
-                    <form method="GET" action="{{ route('books.index') }}">
-                        <div class="space-y-4">
-                            <div>
-                                <label for="search" class="block text-sm font-medium text-gray-700">General Search</label>
-                                <input type="text" name="search" id="search" placeholder="Title, Author, ISBN..." value="{{ request('search') }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                            </div>
-                            <div>
-                                <label for="author" class="block text-sm font-medium text-gray-700">Author</label>
-                                <input type="text" name="author" id="author" value="{{ request('author') }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                            </div>
-                            <div>
-                                <label for="isbn" class="block text-sm font-medium text-gray-700">ISBN</label>
-                                <input type="text" name="isbn" id="isbn" value="{{ request('isbn') }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                            </div>
-                            <div>
-                                <label for="publisher" class="block text-sm font-medium text-gray-700">Publisher</label>
-                                <input type="text" name="publisher" id="publisher" value="{{ request('publisher') }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                            </div>
-                            <div class="flex items-center gap-4 pt-2">
-                                <button type="submit" class="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                    Search
-                                </button>
-                                <a href="{{ route('books.index') }}" class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                                    Reset
-                                </a>
-                            </div>
-                        </div>
-                    </form>
+            
+                            <aside class="lg:col-span-1">
+    <div class="p-6 bg-gray-50 rounded-lg shadow">
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Filter & Search</h3>
+        <form method="GET" action="{{ route('books.index') }}">
+            <div class="space-y-4">
+                <div>
+                    <label for="search" class="block text-sm font-medium text-gray-700">General Search</label>
+                    <input type="text" name="search" id="search" placeholder="Title, Author, ISBN..." value="{{ request('search') }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                 </div>
-            </aside>
+                
+                {{-- Author Dropdown --}}
+                <div>
+                    <label for="author" class="block text-sm font-medium text-gray-700">Filter by Author</label>
+                    <select name="author" id="author" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                        <option value="">All Authors</option>
+                        {{-- Assuming $authors is an array/collection of unique author names --}}
+                        @foreach ($authors as $author)
+                            <option value="{{ $author }}" {{ request('author') == $author ? 'selected' : '' }}>
+                                {{ $author }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                {{-- ISBN Dropdown (Optional, but kept for completeness if needed) --}}
+                {{-- Note: Filtering by ISBN may be less useful for a general view --}}
+                <div>
+                    <label for="isbn" class="block text-sm font-medium text-gray-700">Filter by ISBN</label>
+                    <select name="isbn" id="isbn" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                        <option value="">All ISBNs</option>
+                        {{-- Assuming $isbns is an array/collection of unique ISBNs --}}
+                        @foreach ($isbns as $isbn)
+                            <option value="{{ $isbn }}" {{ request('isbn') == $isbn ? 'selected' : '' }}>
+                                {{ $isbn }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                {{-- Publisher Dropdown --}}
+                <div>
+                    <label for="publisher" class="block text-sm font-medium text-gray-700">Filter by Publisher</label>
+                    <select name="publisher" id="publisher" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                        <option value="">All Publishers</option>
+                        {{-- Assuming $publishers is an array/collection of unique publisher names --}}
+                        @foreach ($publishers as $publisher)
+                            <option value="{{ $publisher }}" {{ request('publisher') == $publisher ? 'selected' : '' }}>
+                                {{ $publisher }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="flex items-center gap-4 pt-2">
+                    <button type="submit" class="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Search
+                    </button>
+                    <a href="{{ route('books.index') }}" class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                        Reset
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</aside>
 
             {{-- Main Content: Book List --}}
             <div class="lg:col-span-3">

@@ -7,6 +7,7 @@ use App\Models\Loan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+// use App\Models\Invoice;
 use App\Console\Commands\CalculatePenalties;
 
 class DashboardController extends Controller
@@ -33,12 +34,15 @@ class DashboardController extends Controller
         foreach ($userLoans as $loan) {
             if (Carbon::now()->isAfter($loan->due_date) && $loan->penalty_status !== 'paid') {
                 $overdueDays = abs($loan->due_date->startOfDay()->diffInDays(Carbon::now()->startOfDay()));
-                $loan->penalty_amount = $overdueDays * CalculatePenalties::PENALTY_RATE_PER_DAY;
+                $loan->penalty_amount = $overdueDays * config('library.penalty_rate_ksh', 50); // Using config for Ksh rate
                 $loan->penalty_status = 'unpaid';
                 // Don't save here - just calculate for display
             }
         }
 
-        return view('dashboard', compact('totalBooks', 'availableBooks', 'borrowedBooks', 'authors', 'publishers', 'genres', 'userLoans'));
+        // Fetch the current user's invoices
+        $userInvoices = []; //Invoice::where('user_id', Auth::id())->latest()->get();
+
+        return view('dashboard', compact('totalBooks', 'availableBooks', 'borrowedBooks', 'authors', 'publishers', 'genres', 'userLoans', 'userInvoices'));
     }
 }

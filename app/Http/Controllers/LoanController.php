@@ -87,7 +87,7 @@ class LoanController extends Controller
                     // Use startOfDay() to count full days overdue
                     // Note: diffInDays calculates the difference, so we use abs() and ensure positive value
                     $overdueDays = abs($loan->due_date->startOfDay()->diffInDays($returnTimestamp->startOfDay()));
-                    $loan->penalty_amount = $overdueDays * \App\Console\Commands\CalculatePenalties::PENALTY_RATE_PER_DAY;
+                    $loan->penalty_amount = $overdueDays * config('library.penalty_rate_ksh', 50); // Using config for Ksh rate
                     $loan->penalty_status = 'unpaid';
                 }
 

@@ -5,6 +5,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\LoanController;
+use App\Http\Controllers\PenaltyController; 
+use App\Http\Controllers\MpesaController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -30,11 +32,15 @@ Route::middleware('web')->group(function () {
         // Loan Management Routes
         Route::post('/books/{book}/borrow', [LoanController::class, 'borrow'])->name('loans.borrow');
         Route::patch('/loans/{loan}/return', [LoanController::class, 'returnBook'])->name('loans.return');
-        
+
+        // Penalty Management
+        Route::get('/penalties', [PenaltyController::class, 'index'])->name('penalties.index');
 
 
         Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
         Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
         Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+        Route::post('/mpesa/stkpush', [MpesaController::class, 'initiateStkPush'])->name('mpesa.stkpush');
     });
 });

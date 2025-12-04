@@ -71,6 +71,7 @@
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                             @if($loan->penalty_amount > 0)
                                                 <span class="font-bold text-red-600">${{ number_format($loan->penalty_amount, 2) }} ({{ ucfirst($loan->penalty_status) }})</span>
+                                                <span class="font-bold text-red-600">Ksh {{ number_format($loan->penalty_amount, 2) }} ({{ ucfirst($loan->penalty_status) }})</span>
                                             @endif
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -94,6 +95,53 @@
                     </div>
                 </div>
             </div>
+
+            <!-- {{-- My Invoices --}}
+            <div class="mt-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">My Invoices</h2>
+                <div class="bg-white rounded-lg shadow border border-gray-200 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Invoice Number</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Issue Date</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Due Date</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                @forelse ($userInvoices as $invoice)
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm font-medium text-gray-900">{{ $invoice->invoice_number }}</div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            Ksh {{ number_format($invoice->amount, 2) }}
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            {{ $invoice->issue_date->format('F j, Y') }}
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            {{ $invoice->due_date->format('F j, Y') }}
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap capitalize">
+                                            {{ $invoice->status }}
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+                                            No invoices found.
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div> -->
         </div>
     </div>
 @endsection

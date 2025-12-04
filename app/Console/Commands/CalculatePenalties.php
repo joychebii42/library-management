@@ -4,12 +4,13 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Models\Loan;
+use App\Models\Penalty;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Mail;
-use App\Mail\OverdueBookReminder;
 
 class CalculatePenalties extends Command
 {
+    public const PENALTY_RATE_PER_DAY = 50.00;
+
     /**
      * The name and signature of the console command.
      *
@@ -22,10 +23,7 @@ class CalculatePenalties extends Command
      *
      * @var string
      */
-    protected $description = 'Calculate penalties for overdue books';
-
-    // Define penalty rate, e.g., $1 per day
-    const PENALTY_RATE_PER_DAY = 1.00;
+    protected $description = 'Calculate and create penalties for overdue books';
 
     /**
      * Execute the console command.
@@ -34,29 +32,27 @@ class CalculatePenalties extends Command
      */
     public function handle()
     {
-        $this->info('Calculating penalties for overdue books...');
+        $this->info('Calculating penalties for overdue loans...');
 
-        $overdueLoans = Loan::where('due_date', '<', Carbon::today())
-                            ->whereNull('returned_at')
-                            ->with(['user', 'book']) // Eager load relationships
-                            ->get();
+        // Get all active, overdue loans that haven't been penalized today
+        $overdueLoans = Loan::where('status', 'borrowed')
+            ->where('due_date', '<', Carbon::now())
+            ->get();
 
         foreach ($overdueLoans as $loan) {
-            $overdueDays = Carbon::today()->diffInDays($loan->due_date);
-            $newPenalty = $overdueDays * self::PENALTY_RATE_PER_DAY;
+            $today = Carbon::today();
+            $penaltyExists = Penalty::where('loan_id', $loan->id)->whereDate('created_at', $today)->exists();
 
-            // Only update the record and send an email if the penalty amount has changed.
-            // This prevents sending emails every day for the same overdue book.
-            if ($loan->penalty_amount != $newPenalty || $loan->penalty_status !== 'unpaid') {
-                $loan->penalty_amount = $newPenalty;
-                $loan->penalty_status = 'unpaid';
-                Mail::to($loan->user)->queue(new OverdueBookReminder($loan));
-                $loan->save();
+            if (!$penaltyExists) {
+                Penalty::create([
+                    'loan_id' => $loan->id,
+                    'amount' => self::PENALTY_RATE_PER_DAY,
+                    'status' => 'pending',
+                ]);
             }
         }
 
-        $this->info('Finished calculating penalties. ' . $overdueLoans->count() . ' loans updated.');
-
-        return 0;
+        $this->info('Penalty calculation complete.');
+        return Command::SUCCESS;
     }
 }

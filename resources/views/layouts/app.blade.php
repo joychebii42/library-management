@@ -17,6 +17,7 @@
                 <div class="flex items-center space-x-6">
                     <a href="{{ route('dashboard') }}" class="text-white hover:text-gray-200">Dashboard</a>
                     <a href="{{ route('books.index') }}" class="text-white hover:text-gray-200">Books</a>
+                    <a href="{{route('penalties.index')}}" class="text-white hover:text-gray-200">Penalties</a>
                     <div class="relative group">
                         <button class="text-white hover:text-gray-200">{{ Auth::user()->name }}</button>
                         <div class="hidden group-hover:block absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 z-10">
